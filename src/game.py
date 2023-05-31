@@ -19,6 +19,8 @@ class Game:
     def run(self):
         self.CLOCK.tick(self.FPS)
 
+        self.snake.update()
+
         self.update_graphics()
     
     def update_graphics(self):
