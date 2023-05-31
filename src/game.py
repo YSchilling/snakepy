@@ -1,4 +1,5 @@
 import pygame
+from snake import Snake
 
 class Game:
     def __init__(self):
@@ -9,9 +10,11 @@ class Game:
         
         # init window
         self.WINDOW = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        pygame.display.set_caption("Snakepy")
 
         # init game
         self.CLOCK = pygame.time.Clock()
+        self.snake = Snake()
 
     def run(self):
         self.CLOCK.tick(self.FPS)
@@ -20,5 +23,7 @@ class Game:
     
     def update_graphics(self):
         self.WINDOW.fill(self.BACKGROUND_COLOR)
+
+        self.snake.draw(self.WINDOW)
 
         pygame.display.flip()
