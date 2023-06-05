@@ -8,6 +8,8 @@ class Game:
         self.FPS = 60
         self.BACKGROUND_COLOR = (30, 30, 30)
         self.cell_amount = 20
+        self.SNAKE_HEAD_COLOR = (0, 200, 0)
+        self.SNAKE_TAIL_COLOR = (0, 255, 0)
         
         # init window
         self.WINDOW = pygame.display.set_mode((WINDOW_WIDTH_AND_HIGHT, WINDOW_WIDTH_AND_HIGHT))
@@ -18,6 +20,7 @@ class Game:
         self.CLOCK = pygame.time.Clock()
         self.snake = Snake(self)
         self.delta_time = 0
+        self.running = True
 
     def run(self):
         self.delta_time = self.CLOCK.tick(self.FPS)
@@ -26,6 +29,9 @@ class Game:
 
         self._update_graphics()
     
+    def end_game(self):
+        self.running = False
+
     def _update_graphics(self):
         self.WINDOW.fill(self.BACKGROUND_COLOR)
 

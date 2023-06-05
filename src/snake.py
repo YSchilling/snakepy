@@ -1,5 +1,6 @@
 import pygame
 from snake_head import SnakeHead
+from snake_part import SnakePart
 from direction import Direction
 
 class Snake:
@@ -13,21 +14,32 @@ class Snake:
         size = (game.cell_size, game.cell_size)
         middle_coords = game.cell_size * (game.cell_amount / 2)
         pos = (middle_coords, middle_coords)
-        self.head_group.add(SnakeHead(size, pos, (0, 255, 0)))
+        self.head_group.add(SnakeHead(size, pos, game.SNAKE_HEAD_COLOR))
+
+        self.tail_group = pygame.sprite.Group()
+        for i in range(1, 5):
+            pos = (middle_coords, middle_coords + i*game.cell_size)
+            self.tail_group.add(SnakePart(size, pos, game.SNAKE_TAIL_COLOR))
 
         self.move_timer = 0
     
     def update(self):
         self.head_group.update()
-        if self._is_time_to_move():
+        if not self._is_cell_ahead_valid():
+            self.game.end_game()
+        if self._is_time_to_move() and self.game.running:
             self._move()
 
     def draw(self, surface):
         self.head_group.draw(surface)
+        self.tail_group.draw(surface)
     
     def _move(self):
         snake_head = self.head_group.sprite
 
+        snake_part_positions = [snake_head.rect.topleft] + [tail.rect.topleft for tail in self.tail_group]
+        
+        # move head
         if snake_head.direction == Direction.UP:
             snake_head.rect.y -= self.game.cell_size
         elif snake_head.direction == Direction.RIGHT:
@@ -36,7 +48,11 @@ class Snake:
             snake_head.rect.y += self.game.cell_size
         elif snake_head.direction == Direction.LEFT:
             snake_head.rect.x -= self.game.cell_size
-    
+        
+        # move tail
+        for i, tail in enumerate(self.tail_group):
+            tail.rect.topleft = snake_part_positions[i]
+        
     def _is_time_to_move(self):
         self.move_timer += self.game.delta_time
 
@@ -44,4 +60,49 @@ class Snake:
             self.move_timer = 0
             return True
         
+        return False
+    
+    def _is_cell_ahead_valid(self):
+        if self._is_cell_ahead_in_board() and self._is_cell_ahead_empty():
+            return True
+        return False
+    
+    def _is_cell_ahead_in_board(self):
+        head = self.head_group.sprite
+        head_pos_x, head_pos_y = head.rect.center
+        cell_size = self.game.cell_size
+
+        if head.direction == Direction.UP:
+            if (head_pos_y - cell_size) < 0:
+                return False
+        elif head.direction == Direction.RIGHT:
+            if (head_pos_x + cell_size) > self.game.WINDOW.get_width():
+                return False
+        elif head.direction == Direction.DOWN:
+            if (head_pos_y + cell_size) > self.game.WINDOW.get_height():
+                return False
+        elif head.direction == Direction.LEFT:
+            if (head_pos_x - cell_size) < 0:
+                return False
+        
+        return True
+    
+    def _is_cell_ahead_empty(self):
+        head = self.head_group.sprite
+        cell_size = self.game.cell_size
+
+        # define the cell ahead to test collision
+        if head.direction == Direction.UP:
+            cell_ahead = (head.rect.x, head.rect.y - cell_size)
+        elif head.direction == Direction.RIGHT:
+            cell_ahead = (head.rect.x + cell_size, head.rect.y)
+        elif head.direction == Direction.DOWN:
+            cell_ahead = (head.rect.x, head.rect.y + cell_size)
+        elif head.direction == Direction.LEFT:
+            cell_ahead = (head.rect.x - cell_size, head.rect.y)
+        
+        tails = self.tail_group.sprites()
+        test_rect = pygame.rect.Rect(cell_ahead, (cell_size, cell_size))
+        if test_rect.collidelist(tails) == -1:
+            return True
         return False
