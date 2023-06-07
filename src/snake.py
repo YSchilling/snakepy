@@ -1,6 +1,6 @@
 import pygame
 from snake_head import SnakeHead
-from snake_part import SnakePart
+from rect_sprite import RectSprite
 from direction import Direction
 
 class Snake:
@@ -19,7 +19,7 @@ class Snake:
         self.tail_group = pygame.sprite.Group()
         for i in range(1, 5):
             pos = (middle_coords, middle_coords + i*game.cell_size)
-            self.tail_group.add(SnakePart(size, pos, game.SNAKE_TAIL_COLOR))
+            self.tail_group.add(RectSprite(size, pos, game.SNAKE_TAIL_COLOR))
 
         self.move_timer = 0
         self.append_tail = False
@@ -59,7 +59,7 @@ class Snake:
             last_pos = snake_part_positions[-1]
             pos = (last_pos[0], last_pos[1])
             size = (self.game.cell_size, self.game.cell_size)
-            new_tail = SnakePart(size, pos, self.game.SNAKE_TAIL_COLOR)
+            new_tail = RectSprite(size, pos, self.game.SNAKE_TAIL_COLOR)
             self.tail_group.add(new_tail)
             self.append_tail = False
         

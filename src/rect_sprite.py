@@ -1,6 +1,6 @@
 import pygame
 
-class SnakePart(pygame.sprite.Sprite):
+class RectSprite(pygame.sprite.Sprite):
     def __init__(self, size, pos, color):
         super().__init__()
 

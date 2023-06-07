@@ -1,8 +1,8 @@
 import pygame
-from snake_part import SnakePart
 from direction import Direction
+from rect_sprite import RectSprite
 
-class SnakeHead(SnakePart):
+class SnakeHead(RectSprite):
     def __init__(self, size, pos, color):
         super().__init__(size, pos, color)
 

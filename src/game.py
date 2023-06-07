@@ -1,7 +1,7 @@
 import pygame
 import random
 from snake import Snake
-from fruit import Fruit
+from rect_sprite import RectSprite
 
 class Game:
     def __init__(self):
@@ -63,4 +63,4 @@ class Game:
             ):
                 found_empty_cell = True
 
-        self.fruit_group.add(Fruit(size, (pos_x, pos_y), (153, 153, 255)))
+        self.fruit_group.add(RectSprite(size, (pos_x, pos_y), (153, 153, 255)))
