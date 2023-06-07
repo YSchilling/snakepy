@@ -38,6 +38,7 @@ class Snake:
     
     def _move(self):
         snake_head = self.head_group.sprite
+        snake_head.update_last_moved_direction()
 
         snake_part_positions = [snake_head.rect.topleft] + [tail.rect.topleft for tail in self.tail_group]
         
