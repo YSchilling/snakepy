@@ -1,13 +1,13 @@
 import pygame
 from game import Game
 
-def main():
+def main() -> none:
     # init
     pygame.init()
-    game = Game()
+    game: Game = Game()
 
     # game loop
-    run = True
+    run: bool = True
     while run:
 
         # event loop

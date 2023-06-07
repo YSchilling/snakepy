@@ -2,9 +2,10 @@ import pygame
 from snake_head import SnakeHead
 from rect_sprite import RectSprite
 from direction import Direction
+from game import Game
 
 class Snake:
-    def __init__(self, game):
+    def __init__(self, game: Game) -> None:
         # settings
         self.game = game
         self.moves_per_second = 1.5
@@ -24,7 +25,7 @@ class Snake:
         self.move_timer = 0
         self.append_tail = False
     
-    def update(self):
+    def update(self) -> None:
         self.head_group.update()
         if self._is_time_to_move():
             if self._is_cell_ahead_valid():
@@ -34,11 +35,11 @@ class Snake:
             
         self._check_fruit_collision()
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.surface.Surface) -> None:
         self.head_group.draw(surface)
         self.tail_group.draw(surface)
     
-    def _move(self):
+    def _move(self) -> None:
         snake_head = self.head_group.sprite
         snake_head.update_last_moved_direction()
 
@@ -66,7 +67,7 @@ class Snake:
             self.tail_group.add(new_tail)
             self.append_tail = False
         
-    def _is_time_to_move(self):
+    def _is_time_to_move(self) -> None:
         self.move_timer += self.game.delta_time
 
         if self.move_timer > (1000 / self.moves_per_second):
@@ -75,12 +76,12 @@ class Snake:
         
         return False
     
-    def _is_cell_ahead_valid(self):
+    def _is_cell_ahead_valid(self) -> None:
         if self._is_cell_ahead_in_board() and self._is_cell_ahead_empty():
             return True
         return False
     
-    def _is_cell_ahead_in_board(self):
+    def _is_cell_ahead_in_board(self) -> None:
         head = self.head_group.sprite
         head_pos_x, head_pos_y = head.rect.center
         cell_size = self.game.cell_size
@@ -100,7 +101,7 @@ class Snake:
         
         return True
     
-    def _is_cell_ahead_empty(self):
+    def _is_cell_ahead_empty(self) -> None:
         head = self.head_group.sprite
         cell_size = self.game.cell_size
 
@@ -120,7 +121,7 @@ class Snake:
             return True
         return False
     
-    def _check_fruit_collision(self):
+    def _check_fruit_collision(self) -> None:
         head = self.head_group.sprite
         fruit = self.game.fruit_group.sprite
 

@@ -4,7 +4,7 @@ from snake import Snake
 from rect_sprite import RectSprite
 
 class Game:
-    def __init__(self):
+    def __init__(self) -> None:
         # settings
         WINDOW_WIDTH_AND_HIGHT = 600
         self.FPS = 60
@@ -27,17 +27,17 @@ class Game:
         self.fruit_group = pygame.sprite.GroupSingle()
         self._spawn_fruit()
 
-    def run(self):
+    def run(self) -> None:
         if self.running:
             self.delta_time = self.CLOCK.tick(self.FPS)
             self.snake.update()
 
         self._update_graphics()
     
-    def end_game(self):
+    def end_game(self) -> None:
         self.running = False
 
-    def _update_graphics(self):
+    def _update_graphics(self) -> None:
         self.WINDOW.fill(self.BACKGROUND_COLOR)
 
         self.snake.draw(self.WINDOW)
@@ -45,7 +45,7 @@ class Game:
 
         pygame.display.flip()
     
-    def _spawn_fruit(self):
+    def _spawn_fruit(self) -> None:
 
         found_empty_cell = False
         while not found_empty_cell:
