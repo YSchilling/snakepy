@@ -1,10 +1,11 @@
 import pygame
 from game import Game
+from events import Events
 
 def main() -> None:
     # init
     pygame.init()
-    game: Game = Game()
+    game = Game()
 
     # game loop
     run: bool = True
@@ -14,6 +15,8 @@ def main() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            elif event.type == Events.RESTART:
+                game = Game()
 
         # game tick
         game.run()

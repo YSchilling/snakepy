@@ -2,6 +2,7 @@ import pygame
 import random
 from rect_sprite import RectSprite
 from game_settings import GameSettings
+from events import Events
 
 class Game:
     def __init__(self) -> None:
@@ -29,6 +30,9 @@ class Game:
             self.snake.update()
 
         self._update_graphics()
+
+        if not self.running:
+            self._check_restart()
     
     def end_game(self) -> None:
         self.running = False
@@ -39,6 +43,8 @@ class Game:
         self.snake.draw(self.WINDOW)
         self.fruit_group.draw(self.WINDOW)
         self._draw_score()
+
+        if not self.running: self._draw_game_over()
 
         pygame.display.flip()
     
@@ -64,3 +70,26 @@ class Game:
     
     def _draw_score(self):
         self.WINDOW.blit(self.FONT.render(str(self.score), True, GameSettings.TEXT_COLOR), (self.WINDOW.get_width() / 2, 50))
+    
+    def _draw_game_over(self):
+        game_over_text = "Game Over"
+        score_text = "Score: " + str(self.score)
+        restart_text = "Press Enter to restart"
+
+        title_width = self.FONT.size(game_over_text)[0]
+        score_width = self.FONT.size(score_text)[0]
+        restart_width = self.FONT.size(restart_text)[0]
+
+        self.WINDOW.blit(self.FONT.render(game_over_text, True, (255, 50, 50)),
+            (self.WINDOW.get_width() / 2 - title_width / 2, self.WINDOW.get_height() / 2 - 48))
+        self.WINDOW.blit(self.FONT.render(score_text, True, (255, 255, 255)),
+            (self.WINDOW.get_width() / 2 - score_width / 2, self.WINDOW.get_height() / 2))
+        self.WINDOW.blit(self.FONT.render(restart_text, True, (255, 255, 255)),
+            (self.WINDOW.get_width() / 2 - restart_width / 2, self.WINDOW.get_height() / 2 + 48)
+        )
+    
+    def _check_restart(self):
+        keys_pressed = pygame.key.get_pressed()
+
+        if keys_pressed[pygame.K_RETURN]:
+            pygame.event.post(pygame.event.Event(Events.RESTART))
