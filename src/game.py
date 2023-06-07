@@ -17,6 +17,8 @@ class Game:
         self.delta_time = 0
         self.running = True
         self.snake = Snake(self)
+        self.score = 0
+        self.FONT = pygame.font.SysFont("calibri", 32)
 
         self.fruit_group = pygame.sprite.GroupSingle()
         self._spawn_fruit()
@@ -36,6 +38,7 @@ class Game:
 
         self.snake.draw(self.WINDOW)
         self.fruit_group.draw(self.WINDOW)
+        self._draw_score()
 
         pygame.display.flip()
     
@@ -57,4 +60,7 @@ class Game:
             ):
                 found_empty_cell = True
 
-        self.fruit_group.add(RectSprite(size, (pos_x, pos_y), (153, 153, 255)))
+        self.fruit_group.add(RectSprite(size, (pos_x, pos_y), GameSettings.FRUIT_COLOR))
+    
+    def _draw_score(self):
+        self.WINDOW.blit(self.FONT.render(str(self.score), True, GameSettings.TEXT_COLOR), (self.WINDOW.get_width() / 2, 50))

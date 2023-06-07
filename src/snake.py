@@ -129,4 +129,5 @@ class Snake:
         if head.rect.colliderect(fruit.rect):
             fruit.kill()
             self.append_tail = True
+            self.game.score += 1
             self.game._spawn_fruit()
