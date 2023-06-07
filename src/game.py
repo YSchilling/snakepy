@@ -1,24 +1,18 @@
 import pygame
 import random
-from snake import Snake
 from rect_sprite import RectSprite
+from game_settings import GameSettings
 
 class Game:
     def __init__(self) -> None:
-        # settings
-        WINDOW_WIDTH_AND_HIGHT = 600
-        self.FPS = 60
-        self.BACKGROUND_COLOR = (30, 30, 30)
-        self.cell_amount = 20
-        self.SNAKE_HEAD_COLOR = (0, 200, 0)
-        self.SNAKE_TAIL_COLOR = (0, 255, 0)
-        
+        from snake import Snake
         # init window
-        self.WINDOW = pygame.display.set_mode((WINDOW_WIDTH_AND_HIGHT, WINDOW_WIDTH_AND_HIGHT))
+        wwh = GameSettings.WINDOW_WIDTH_AND_HIGHT
+        self.WINDOW = pygame.display.set_mode((wwh, wwh))
         pygame.display.set_caption("Snakepy")
 
         # init game
-        self.cell_size = self.WINDOW.get_width() / self.cell_amount
+        self.cell_size = self.WINDOW.get_width() / GameSettings.CELL_AMOUNT
         self.CLOCK = pygame.time.Clock()
         self.delta_time = 0
         self.running = True
@@ -29,7 +23,7 @@ class Game:
 
     def run(self) -> None:
         if self.running:
-            self.delta_time = self.CLOCK.tick(self.FPS)
+            self.delta_time = self.CLOCK.tick(GameSettings.FPS)
             self.snake.update()
 
         self._update_graphics()
@@ -38,7 +32,7 @@ class Game:
         self.running = False
 
     def _update_graphics(self) -> None:
-        self.WINDOW.fill(self.BACKGROUND_COLOR)
+        self.WINDOW.fill(GameSettings.BACKGROUND_COLOR)
 
         self.snake.draw(self.WINDOW)
         self.fruit_group.draw(self.WINDOW)

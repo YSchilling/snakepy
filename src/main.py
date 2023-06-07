@@ -1,7 +1,7 @@
 import pygame
 from game import Game
 
-def main() -> none:
+def main() -> None:
     # init
     pygame.init()
     game: Game = Game()
