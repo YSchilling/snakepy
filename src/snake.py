@@ -26,10 +26,12 @@ class Snake:
     
     def update(self):
         self.head_group.update()
-        if self._is_time_to_move() and self.game.running:
-            if not self._is_cell_ahead_valid():
+        if self._is_time_to_move():
+            if self._is_cell_ahead_valid():
+                self._move()
+            else:
                 self.game.end_game()
-            self._move()
+            
         self._check_fruit_collision()
 
     def draw(self, surface):

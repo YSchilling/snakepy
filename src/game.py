@@ -28,9 +28,9 @@ class Game:
         self._spawn_fruit()
 
     def run(self):
-        self.delta_time = self.CLOCK.tick(self.FPS)
-
-        self.snake.update()
+        if self.running:
+            self.delta_time = self.CLOCK.tick(self.FPS)
+            self.snake.update()
 
         self._update_graphics()
     
