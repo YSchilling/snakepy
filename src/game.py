@@ -25,7 +25,7 @@ class Game:
         self.snake = Snake(self)
 
         self.fruit_group = pygame.sprite.GroupSingle()
-        self.spawn_fruit()
+        self._spawn_fruit()
 
     def run(self):
         self.delta_time = self.CLOCK.tick(self.FPS)
@@ -41,6 +41,7 @@ class Game:
         self.WINDOW.fill(self.BACKGROUND_COLOR)
 
         self.snake.draw(self.WINDOW)
+        self.fruit_group.draw(self.WINDOW)
 
         pygame.display.flip()
     
@@ -53,12 +54,13 @@ class Game:
 
             pos_x = random.choice(pos_x_list)
             pos_y = random.choice(pos_y_list)
+            size = (self.cell_size, self.cell_size)
 
-            test_rect = pygame.rect.Rect((pos_x, pos_y), self.cell_size)
+            test_rect = pygame.rect.Rect((pos_x, pos_y), size)
             if (
-                test_rect.collidelist(self.snake.tails_group.sprites()) == -1
+                test_rect.collidelist(self.snake.tail_group.sprites()) == -1
                 and test_rect.collidelist(self.snake.head_group.sprites()) == -1
             ):
                 found_empty_cell = True
 
-        self.fruit_group.add(Fruit(self.cell_size, pos_x, pos_y))
+        self.fruit_group.add(Fruit(size, (pos_x, pos_y), (153, 153, 255)))

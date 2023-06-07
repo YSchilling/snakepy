@@ -22,13 +22,15 @@ class Snake:
             self.tail_group.add(SnakePart(size, pos, game.SNAKE_TAIL_COLOR))
 
         self.move_timer = 0
+        self.append_tail = False
     
     def update(self):
         self.head_group.update()
-        if not self._is_cell_ahead_valid():
-            self.game.end_game()
         if self._is_time_to_move() and self.game.running:
+            if not self._is_cell_ahead_valid():
+                self.game.end_game()
             self._move()
+        self._check_fruit_collision()
 
     def draw(self, surface):
         self.head_group.draw(surface)
@@ -52,6 +54,14 @@ class Snake:
         # move tail
         for i, tail in enumerate(self.tail_group):
             tail.rect.topleft = snake_part_positions[i]
+        
+        if self.append_tail:
+            last_pos = snake_part_positions[-1]
+            pos = (last_pos[0], last_pos[1])
+            size = (self.game.cell_size, self.game.cell_size)
+            new_tail = SnakePart(size, pos, self.game.SNAKE_TAIL_COLOR)
+            self.tail_group.add(new_tail)
+            self.append_tail = False
         
     def _is_time_to_move(self):
         self.move_timer += self.game.delta_time
@@ -106,3 +116,12 @@ class Snake:
         if test_rect.collidelist(tails) == -1:
             return True
         return False
+    
+    def _check_fruit_collision(self):
+        head = self.head_group.sprite
+        fruit = self.game.fruit_group.sprite
+
+        if head.rect.colliderect(fruit.rect):
+            fruit.kill()
+            self.append_tail = True
+            self.game._spawn_fruit()
