@@ -8,7 +8,7 @@ def main() -> None:
     game = Game()
 
     # game loop
-    run: bool = True
+    run = True
     while run:
 
         # event loop

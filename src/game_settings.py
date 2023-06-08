@@ -1,8 +1,11 @@
 class GameSettings:
-    # logic
+    # game
     FPS = 60
-    CELL_AMOUNT = 20
     WINDOW_WIDTH_AND_HIGHT = 600
+    CELL_AMOUNT = 20 # needs to fit into WINDOW_WIDTH_AND_HIGHT
+
+    # snake
+    MOVES_PER_SECOND = 1.5
     
     # colors
     BACKGROUND_COLOR = (30, 30, 30)

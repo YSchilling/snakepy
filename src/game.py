@@ -8,87 +8,86 @@ class Game:
     def __init__(self) -> None:
         from snake import Snake
         # init window
-        wwh = GameSettings.WINDOW_WIDTH_AND_HIGHT
-        self.WINDOW = pygame.display.set_mode((wwh, wwh))
+        self.WINDOW = pygame.display.set_mode((GameSettings.WINDOW_WIDTH_AND_HIGHT, GameSettings.WINDOW_WIDTH_AND_HIGHT))
         pygame.display.set_caption("Snakepy")
 
         # init game
-        self.cell_size = self.WINDOW.get_width() / GameSettings.CELL_AMOUNT
+            # constants
         self.CLOCK = pygame.time.Clock()
-        self.delta_time = 0
-        self.running = True
-        self.snake = Snake(self)
-        self.score = 0
         self.FONT = pygame.font.SysFont("calibri", 32)
 
+            # attributes
+        cell_width = int(self.WINDOW.get_width() / GameSettings.CELL_AMOUNT)
+        self.cell_size = (cell_width, cell_width)
+        self.delta_time = 0
+        self.running = True
+        self.score = 0
+        
+        # init sprites
+        self.snake = Snake(self)
         self.fruit_group = pygame.sprite.GroupSingle()
+        
+        # init methods
         self._spawn_fruit()
 
     def run(self) -> None:
         if self.running:
             self.delta_time = self.CLOCK.tick(GameSettings.FPS)
             self.snake.update()
+        else:
+            self._check_restart()
 
         self._update_graphics()
 
-        if not self.running:
-            self._check_restart()
-    
-    def end_game(self) -> None:
-        self.running = False
-
     def _update_graphics(self) -> None:
+        # clear window
         self.WINDOW.fill(GameSettings.BACKGROUND_COLOR)
 
+        # draw
         self.snake.draw(self.WINDOW)
         self.fruit_group.draw(self.WINDOW)
         self._draw_score()
 
         if not self.running: self._draw_game_over()
 
+        # update window
         pygame.display.flip()
     
     def _spawn_fruit(self) -> None:
 
         found_empty_cell = False
         while not found_empty_cell:
-            pos_x_list = [x for x in range(0, self.WINDOW.get_width(), int(self.cell_size))]
-            pos_y_list = [y for y in range(0, self.WINDOW.get_height(), int(self.cell_size))]
+            pos_x_list = [x for x in range(0, self.WINDOW.get_width(), self.cell_size[0])]
+            pos_y_list = [y for y in range(0, self.WINDOW.get_height(), self.cell_size[1])]
 
             pos_x = random.choice(pos_x_list)
             pos_y = random.choice(pos_y_list)
-            size = (self.cell_size, self.cell_size)
 
-            test_rect = pygame.rect.Rect((pos_x, pos_y), size)
-            if (
-                test_rect.collidelist(self.snake.tail_group.sprites()) == -1
-                and test_rect.collidelist(self.snake.head_group.sprites()) == -1
-            ):
+            # test if pos is empty
+            test_rect = pygame.rect.Rect((pos_x, pos_y), self.cell_size)
+            snake_positions = self.snake.head_group.sprites() + self.snake.tail_group.sprites()
+            if test_rect.collidelist(snake_positions) == -1:
                 found_empty_cell = True
 
-        self.fruit_group.add(RectSprite(size, (pos_x, pos_y), GameSettings.FRUIT_COLOR))
+        self.fruit_group.add(RectSprite(self.cell_size, (pos_x, pos_y), GameSettings.FRUIT_COLOR))
     
-    def _draw_score(self):
-        self.WINDOW.blit(self.FONT.render(str(self.score), True, GameSettings.TEXT_COLOR), (self.WINDOW.get_width() / 2, 50))
+    def _draw_score(self) -> None:
+        y_offset = -(GameSettings.WINDOW_WIDTH_AND_HIGHT / 2) + 50
+        self._draw_center_text(str(self.score), y_offset)
     
-    def _draw_game_over(self):
-        game_over_text = "Game Over"
-        score_text = "Score: " + str(self.score)
-        restart_text = "Press Enter to restart"
+    def _draw_game_over(self) -> None:
+        self._draw_center_text("Game Over", -48)
+        self._draw_center_text("Score: " + str(self.score), 0)
+        self._draw_center_text("Press Enter to restart", 48)
+    
+    def _draw_center_text(self, text: str, y_offset: int) -> None:
+        text_render = self.FONT.render(text, True, GameSettings.TEXT_COLOR)
+        text_width = self.FONT.size(text)[0]
+        mid_pos = GameSettings.WINDOW_WIDTH_AND_HIGHT / 2
+        pos = (mid_pos - text_width / 2, mid_pos + y_offset)
+        self.WINDOW.blit(text_render, pos)
 
-        title_width = self.FONT.size(game_over_text)[0]
-        score_width = self.FONT.size(score_text)[0]
-        restart_width = self.FONT.size(restart_text)[0]
-
-        self.WINDOW.blit(self.FONT.render(game_over_text, True, (255, 50, 50)),
-            (self.WINDOW.get_width() / 2 - title_width / 2, self.WINDOW.get_height() / 2 - 48))
-        self.WINDOW.blit(self.FONT.render(score_text, True, (255, 255, 255)),
-            (self.WINDOW.get_width() / 2 - score_width / 2, self.WINDOW.get_height() / 2))
-        self.WINDOW.blit(self.FONT.render(restart_text, True, (255, 255, 255)),
-            (self.WINDOW.get_width() / 2 - restart_width / 2, self.WINDOW.get_height() / 2 + 48)
-        )
-    
-    def _check_restart(self):
+    def _check_restart(self) -> None:
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[pygame.K_RETURN]:

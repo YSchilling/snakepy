@@ -7,32 +7,29 @@ from game_settings import GameSettings
 
 class Snake:
     def __init__(self, game: Game) -> None:
-        # settings
         self.game = game
-        self.moves_per_second = 1.5
+        self.moves_per_second = GameSettings.MOVES_PER_SECOND
+        self.move_timer = 0
+        self.append_tail = False
 
-        # init
         self.head_group = pygame.sprite.GroupSingle()
-        size = (game.cell_size, game.cell_size)
-        middle_coords = game.cell_size * (GameSettings.CELL_AMOUNT / 2)
+        middle_coords = game.cell_size[0] * (GameSettings.CELL_AMOUNT / 2)
         pos = (middle_coords, middle_coords)
-        self.head_group.add(SnakeHead(size, pos, GameSettings.SNAKE_HEAD_COLOR))
+        self.head_group.add(SnakeHead(game.cell_size, pos, GameSettings.SNAKE_HEAD_COLOR))
 
         self.tail_group = pygame.sprite.Group()
         for i in range(1, 5):
-            pos = (middle_coords, middle_coords + i*game.cell_size)
-            self.tail_group.add(RectSprite(size, pos, GameSettings.SNAKE_TAIL_COLOR))
-
-        self.move_timer = 0
-        self.append_tail = False
+            pos = (middle_coords, middle_coords + i*game.cell_size[0])
+            self.tail_group.add(RectSprite(self.game.cell_size, pos, GameSettings.SNAKE_TAIL_COLOR))
     
     def update(self) -> None:
         self.head_group.update()
+
         if self._is_time_to_move():
             if self._is_cell_ahead_valid():
                 self._move()
             else:
-                self.game.end_game()
+                self.game.running = False
             
         self._check_fruit_collision()
 
@@ -48,13 +45,13 @@ class Snake:
         
         # move head
         if snake_head.direction == Direction.UP:
-            snake_head.rect.y -= self.game.cell_size
+            snake_head.rect.y -= self.game.cell_size[1]
         elif snake_head.direction == Direction.RIGHT:
-            snake_head.rect.x += self.game.cell_size
+            snake_head.rect.x += self.game.cell_size[0]
         elif snake_head.direction == Direction.DOWN:
-            snake_head.rect.y += self.game.cell_size
+            snake_head.rect.y += self.game.cell_size[1]
         elif snake_head.direction == Direction.LEFT:
-            snake_head.rect.x -= self.game.cell_size
+            snake_head.rect.x -= self.game.cell_size[0]
         
         # move tail
         for i, tail in enumerate(self.tail_group):
@@ -62,9 +59,7 @@ class Snake:
         
         if self.append_tail:
             last_pos = snake_part_positions[-1]
-            pos = (last_pos[0], last_pos[1])
-            size = (self.game.cell_size, self.game.cell_size)
-            new_tail = RectSprite(size, pos, GameSettings.SNAKE_TAIL_COLOR)
+            new_tail = RectSprite(self.game.cell_size, last_pos, GameSettings.SNAKE_TAIL_COLOR)
             self.tail_group.add(new_tail)
             self.append_tail = False
         
@@ -85,7 +80,7 @@ class Snake:
     def _is_cell_ahead_in_board(self) -> None:
         head = self.head_group.sprite
         head_pos_x, head_pos_y = head.rect.center
-        cell_size = self.game.cell_size
+        cell_size = self.game.cell_size[0]
 
         if head.direction == Direction.UP:
             if (head_pos_y - cell_size) < 0:
@@ -104,7 +99,7 @@ class Snake:
     
     def _is_cell_ahead_empty(self) -> None:
         head = self.head_group.sprite
-        cell_size = self.game.cell_size
+        cell_size = self.game.cell_size[0]
 
         # define the cell ahead to test collision
         if head.direction == Direction.UP:
@@ -117,7 +112,7 @@ class Snake:
             cell_ahead = (head.rect.x - cell_size, head.rect.y)
         
         tails = self.tail_group.sprites()
-        test_rect = pygame.rect.Rect(cell_ahead, (cell_size, cell_size))
+        test_rect = pygame.rect.Rect(cell_ahead, self.game.cell_size)
         if test_rect.collidelist(tails) == -1:
             return True
         return False
