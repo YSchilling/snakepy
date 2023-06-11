@@ -23,7 +23,7 @@ class Game:
         self.delta_time = 0
         self.running = True
         self.score = 0
-        self.scoreboard = Scoreboard(GameSettings.SCOREBOARD_FILE_PATH)
+        self.scoreboard = Scoreboard(GameSettings.SCOREBOARD_FILE_PATH, self)
         
         # init sprites
         self.snake = Snake(self)
@@ -36,15 +36,13 @@ class Game:
         if self.running:
             self.delta_time = self.CLOCK.tick(GameSettings.FPS)
             self.snake.update()
-        else:
+        elif self.scoreboard.is_new_name_finished:
             self._check_restart()
 
         self._update_graphics()
 
-    def end_game(self):
+    def end_game(self) -> None:
         self.running = False
-        self.scoreboard.add_score({"name": "kek", "score": self.score})
-        self.scoreboard.save()
 
     def _update_graphics(self) -> None:
         # clear window
@@ -55,6 +53,8 @@ class Game:
             self.snake.draw(self.WINDOW)
             self.fruit_group.draw(self.WINDOW)
             self._draw_score()
+        elif not self.scoreboard.is_new_name_finished:
+            self.scoreboard.draw_set_name_screen()
         else:
             self._draw_game_over()
 
@@ -84,14 +84,8 @@ class Game:
     
     def _draw_game_over(self) -> None:
         self._draw_center_text("Game Over", 16)
-        self._draw_scoreboard()
-        self._draw_center_text("Press Enter to restart", GameSettings.WINDOW_WIDTH_AND_HIGHT - 48)
-    
-    def _draw_scoreboard(self):
-        for pos, score in enumerate(self.scoreboard.scores):
-            if pos >= 10: break
-            text = f"{pos+1}: {score['score']} {score['name']}"
-            self._draw_center_text(text, 64+48*pos)
+        self.scoreboard.draw()
+        self._draw_center_text("Press R to restart", GameSettings.WINDOW_WIDTH_AND_HIGHT - 48)
 
     def _draw_center_text(self, text: str, y_pos: int) -> None:
         text_render = self.FONT.render(text, True, GameSettings.TEXT_COLOR)
@@ -103,5 +97,5 @@ class Game:
     def _check_restart(self) -> None:
         keys_pressed = pygame.key.get_pressed()
 
-        if keys_pressed[pygame.K_RETURN]:
+        if keys_pressed[pygame.K_r]:
             pygame.event.post(pygame.event.Event(Events.RESTART))

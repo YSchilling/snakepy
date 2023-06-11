@@ -1,2 +1,3 @@
+import pygame
 class Events:
-    RESTART = 0
+    RESTART = pygame.USEREVENT+0
