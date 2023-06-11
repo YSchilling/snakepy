@@ -3,6 +3,7 @@ import random
 from rect_sprite import RectSprite
 from game_settings import GameSettings
 from events import Events
+from scoreboard import Scoreboard
 
 class Game:
     def __init__(self) -> None:
@@ -14,7 +15,7 @@ class Game:
         # init game
             # constants
         self.CLOCK = pygame.time.Clock()
-        self.FONT = pygame.font.SysFont("calibri", 32)
+        self.FONT = pygame.font.SysFont("calibri", 28)
 
             # attributes
         cell_width = int(self.WINDOW.get_width() / GameSettings.CELL_AMOUNT)
@@ -22,6 +23,7 @@ class Game:
         self.delta_time = 0
         self.running = True
         self.score = 0
+        self.scoreboard = Scoreboard(GameSettings.SCOREBOARD_FILE_PATH)
         
         # init sprites
         self.snake = Snake(self)
@@ -39,16 +41,22 @@ class Game:
 
         self._update_graphics()
 
+    def end_game(self):
+        self.running = False
+        self.scoreboard.add_score({"name": "kek", "score": self.score})
+        self.scoreboard.save()
+
     def _update_graphics(self) -> None:
         # clear window
         self.WINDOW.fill(GameSettings.BACKGROUND_COLOR)
 
         # draw
-        self.snake.draw(self.WINDOW)
-        self.fruit_group.draw(self.WINDOW)
-        self._draw_score()
-
-        if not self.running: self._draw_game_over()
+        if self.running:
+            self.snake.draw(self.WINDOW)
+            self.fruit_group.draw(self.WINDOW)
+            self._draw_score()
+        else:
+            self._draw_game_over()
 
         # update window
         pygame.display.flip()
@@ -72,19 +80,24 @@ class Game:
         self.fruit_group.add(RectSprite(self.cell_size, (pos_x, pos_y), GameSettings.FRUIT_COLOR))
     
     def _draw_score(self) -> None:
-        y_offset = -(GameSettings.WINDOW_WIDTH_AND_HIGHT / 2) + 50
-        self._draw_center_text(str(self.score), y_offset)
+        self._draw_center_text(str(self.score), 64)
     
     def _draw_game_over(self) -> None:
-        self._draw_center_text("Game Over", -48)
-        self._draw_center_text("Score: " + str(self.score), 0)
-        self._draw_center_text("Press Enter to restart", 48)
+        self._draw_center_text("Game Over", 16)
+        self._draw_scoreboard()
+        self._draw_center_text("Press Enter to restart", GameSettings.WINDOW_WIDTH_AND_HIGHT - 48)
     
-    def _draw_center_text(self, text: str, y_offset: int) -> None:
+    def _draw_scoreboard(self):
+        for pos, score in enumerate(self.scoreboard.scores):
+            if pos >= 10: break
+            text = f"{pos+1}: {score['score']} {score['name']}"
+            self._draw_center_text(text, 64+48*pos)
+
+    def _draw_center_text(self, text: str, y_pos: int) -> None:
         text_render = self.FONT.render(text, True, GameSettings.TEXT_COLOR)
         text_width = self.FONT.size(text)[0]
         mid_pos = GameSettings.WINDOW_WIDTH_AND_HIGHT / 2
-        pos = (mid_pos - text_width / 2, mid_pos + y_offset)
+        pos = (mid_pos - text_width / 2, y_pos)
         self.WINDOW.blit(text_render, pos)
 
     def _check_restart(self) -> None:
